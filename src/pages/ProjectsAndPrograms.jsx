@@ -117,7 +117,6 @@ export default function ProjectsAndPrograms() {
                 </section>
 
                 <section className="block">
-                    <div className="separator"></div>
                     <div className="block__cap">
                         <span className="cap__title">Reachout Program</span>
                     </div>
@@ -166,7 +165,6 @@ export default function ProjectsAndPrograms() {
                 </section>
 
                 <section className="block">
-                    <div className="separator"></div>
                     <div className="block__cap">
                         <span className="cap__title">Outreach Program</span>
                     </div>

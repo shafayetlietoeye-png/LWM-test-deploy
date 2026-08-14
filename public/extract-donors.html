@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DOCX Extractor Tool</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <style>
+    body { font-family: monospace; padding: 20px; background: #111; color: #eee; }
+    #status { color: #0f0; font-size: 18px; margin-bottom: 10px; }
+    #output { white-space: pre-wrap; font-size: 11px; line-height: 1.4; background: #222; padding: 10px; max-height: 80vh; overflow-y: auto; border: 1px solid #555; }
+    button { padding: 10px 20px; background: #c00; color: white; border: none; cursor: pointer; font-size: 16px; margin: 5px; }
+    button:hover { background: #f00; }
+  </style>
+</head>
+<body>
+  <h1>Archive Donors DOCX Extractor</h1>
+  <div id="status">Click the button to extract content...</div>
+  <button onclick="extractDocx()">Extract Archive Donors.docx</button>
+  <button onclick="copyAll()">Copy All Text</button>
+  <div id="output"></div>
+
+  <script>
+    async function extractDocx() {
+      const status = document.getElementById('status');
+      const output = document.getElementById('output');
+      status.textContent = 'Fetching docx file...';
+      
+      try {
+        const response = await fetch('/assets/Archive%20Donors.docx');
+        if (!response.ok) throw new Error('Fetch failed: ' + response.status);
+        
+        status.textContent = 'Parsing ZIP structure...';
+        const buf = await response.arrayBuffer();
+        const zip = await JSZip.loadAsync(buf);
+        
+        status.textContent = 'Extracting XML...';
+        const xmlFile = zip.file('word/document.xml');
+        if (!xmlFile) throw new Error('word/document.xml not found in docx');
+        
+        const xml = await xmlFile.async('string');
+        
+        status.textContent = 'Extracting text nodes...';
+        
+        // Parse paragraph by paragraph for structured output
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(xml, 'text/xml');
+        
+        const paragraphs = doc.getElementsByTagNameNS('http://schemas.openxmlformats.org/wordprocessingml/2006/main', 'p');
+        
+        const lines = [];
+        for (let p of paragraphs) {
+          const textNodes = p.getElementsByTagNameNS('http://schemas.openxmlformats.org/wordprocessingml/2006/main', 't');
+          let line = '';
+          for (let t of textNodes) {
+            line += t.textContent;
+          }
+          lines.push(line);
+        }
+        
+        const fullText = lines.join('\n');
+        output.textContent = fullText;
+        status.textContent = 'DONE! Extracted ' + lines.length + ' paragraphs, ' + fullText.length + ' characters. Copy the text above.';
+        
+      } catch(e) {
+        status.textContent = 'ERROR: ' + e.message;
+        output.textContent = e.stack;
+      }
+    }
+    
+    function copyAll() {
+      const text = document.getElementById('output').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        document.getElementById('status').textContent = 'Copied ' + text.length + ' characters to clipboard!';
+      }).catch(e => {
+        // Fallback selection
+        const el = document.getElementById('output');
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
+        document.getElementById('status').textContent = 'Selected all text - press Ctrl+C to copy';
+      });
+    }
+  </script>
+</body>
+</html>

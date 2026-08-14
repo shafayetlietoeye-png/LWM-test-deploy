@@ -124,15 +124,14 @@ export default function useInitScripts() {
                         stickyTimeout = null;
                     }
                 } else {
-                    if (header.classList.contains('is-active')) {
+                    if (header.classList.contains('is-sticky')) {
                         header.classList.remove('is-active');
-                        stickyTimeout = setTimeout(() => {
-                            if (window.scrollY <= scrollThreshold) {
-                                header.classList.remove('is-sticky');
-                                document.body.classList.remove('header-is-sticky');
-                            }
-                            stickyTimeout = null;
-                        }, 500);
+                        header.classList.remove('is-sticky');
+                        document.body.classList.remove('header-is-sticky');
+                    }
+                    if (stickyTimeout) {
+                        clearTimeout(stickyTimeout);
+                        stickyTimeout = null;
                     }
                 }
             };

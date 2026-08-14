@@ -92,7 +92,6 @@ export default function MuseumStory() {
                 </section>
 
                 <section className="block">
-                    <div className="separator"></div>
                     <div className="block__cap">
                         <span className="cap__title">Mission Statement</span>
                     </div>
