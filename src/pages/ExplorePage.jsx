@@ -4,6 +4,7 @@ import PhotoArchive from './PhotoArchive';
 import StrugglePictorial from './StrugglePictorial';
 import Documents from './Documents';
 import HistoricalSites from './HistoricalSites';
+import OralHistory from './OralHistory';
 
 const PAGE_TITLES = {
     'gallery-1': 'Gallery 1: Heritage and Struggles',
@@ -39,6 +40,7 @@ export default function ExplorePage() {
     if (pageKey === 'struggle-of-bangladesh-pictorial') return <StrugglePictorial />;
     if (pageKey === 'documents') return <Documents />;
     if (pageKey === 'historical-sites') return <HistoricalSites />;
+    if (pageKey === 'oral-history') return <OralHistory />;
 
     const title = PAGE_TITLES[pageKey] || 'Coming Soon';
 
